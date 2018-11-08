@@ -1,0 +1,61 @@
+<mat-toolbar color="primary">
+  <mat-toolbar-row>
+    <span>Runway Forecast</span>
+  </mat-toolbar-row>
+</mat-toolbar>
+
+<div class="section query">
+  <div class="container">
+    <form class="form" [formGroup]='searchForm'>
+      <span class="inline-text"> I am flying to </span>
+      <mat-form-field class="full-width-field">
+        <input matInput placeholder="a ZIP code" [matAutocomplete]="auto" formControlName='airportInput'>
+      </mat-form-field>
+      <br /><span class="inline-text"> on </span>
+      <mat-form-field>
+        <input placeholder="some day" matInput [matDatepicker]="myDatepicker" formControlName='dateInput'>
+        <mat-datepicker-toggle matSuffix [for]="myDatepicker"></mat-datepicker-toggle>
+        <mat-datepicker #myDatepicker></mat-datepicker>
+      </mat-form-field>
+      <span class="inline-text"> at around </span>
+      <mat-form-field>
+        <mat-select placeholder="some time" (selectionChange)="checkInputs($event.value)" formControlName='timeInput'>
+          <mat-option class="select" *ngFor="let time of timeOptions" [value]="time">
+            {{time.displayValue}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-autocomplete #auto="matAutocomplete">
+        <mat-option *ngFor="let airport of (filteredAirports | async)?.results" [value]="airport">
+          <span>{{ airport }}</span>
+        </mat-option>
+      </mat-autocomplete>
+    </form>
+  </div>
+</div>
+
+<div class="section response">
+  <div class="container">
+    <span *ngIf="!forecast?.weather" class="notice">
+      Query results will appear here.
+    </span>
+    <div *ngIf="forecast?.weather">
+      <div class="heading">
+        Expect <b>{{forecast.weather[0].main}}</b> in {{searchForm.value.airportInput}}.
+      </div>
+      <div class="subheading">
+        It will be around {{ forecast.main.temp | number:'0.0-0' }}° F. There is expected to be a {{
+        forecast.weather[0].description }} upon landing.
+      </div>
+      <ul>
+        <li>Pressure: {{ forecast.main.pressure }} hPa</li>
+        <li>Humidity: {{ forecast.main.humidity }}%</li>
+        <li>Wind: {{ forecast.wind.speed }} miles/hour</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<router-outlet>
+</router-outlet>
